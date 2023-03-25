@@ -1,1 +1,1 @@
-web: java -Dserver.port=$PORT $JAVA_OPTS java -jar target/metalideas-0.0.1-SNAPSHOT.war
+web: java -Dserver.port=$PORT $JAVA_OPTS -Dspring.profiles.active=heroku -jar target/metalideas-0.0.1-SNAPSHOT.war
