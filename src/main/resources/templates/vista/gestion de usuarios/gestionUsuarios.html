@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<div th:replace="layouts/menuAdmin :: headerMenu">
+</div>
+
+<body id="body">
+
+    <!-- MENU HEADER -->
+    <div th:replace="layouts/menuAdmin :: navMenuAdmin">
+    </div>
+
+    <!-- MENU SIDEBAR -->
+    <div th:replace="layouts/menuAdmin :: sidebar">
+    </div>
+
+    <div class="container">
+        <div class="row titulo-Gestion">
+            <h1>Gestión de usuarios</h1>
+        </div>
+        <div class="row form-Gestion">
+
+            <div class="row">
+                <div class="col-8 btn-form justify-content-end">
+                    <button class="abrirCerrarFormAdd"><i class='bx bxs-user-plus'></i>Agregar</button>
+                </div>
+                <div class="col-4"></div>
+            </div>
+
+        </div>
+        <div class="row ">
+            <div class="col-8">
+                <div class="contenedor-tabla">
+                    <table class="table table-hover" id="tabla_Usuarios">
+                        <thead>
+                            <tr>
+                                <th scope="col">Nombre</th>
+                                <th scope="col">Apellido</th>
+                                <th scope="col">Correo</th>
+                                <th scope="col">Estado</th>
+                                <th scope="col">Rol</th>
+                                <th scope="col">Opc</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="usuario : ${usuarios}">
+                                <td th:text="${usuario.nombre}"></td>
+                                <td th:text="${usuario.apellido}"></td>
+                                <td th:text="${usuario.correo}"></td>
+                                <td th:text="${usuario.estadoUsuarioIdestadoCliente.nombreEstado}"></td>
+                                <td th:text="${usuario.rolIdrol.nombre}"></td>
+                                <td valign="middle">
+                                    <div class="opc-tabla">
+                                        <i class='bx bx-cog iconos abrirCerrarFormEdit' id="opc-form" th:onclick="cargar([[${usuario.idusuario}]], [[${usuario.nombre}]], [[${usuario.apellido}]], [[${usuario.correo}]], [[${usuario.direccion}]], [[${usuario.rolIdrol.idrol}]], [[${usuario.estadoUsuarioIdestadoCliente.idestadoCliente}]])"></i>
+                                        <i class='bx bx-search-alt-2 iconos'></i>
+                                    </div>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORMULARIO AGREGAR USUARIO -->
+    <div class="form-lateral" id="agregarForm">
+        <div class="form-gestion">
+            <div class="contenedor-formulario" id="contenedor-formulario">
+                <div class="row">
+                    <div class="cerrar-form">
+                        <i class='bx bx-x abrirCerrarFormAdd iconos'></i>
+                    </div>
+                </div>
+                <div class="row titulo-form">
+                    <h1><i class='bx bxs-user-plus'></i>Agregar usuarios</h1>
+                </div>
+                <form th:action="@{/agregarUsuario}" th:object="${nuevoUsuario}" method="post" class="needs-validation"
+                    novalidate>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="campo-form">
+                                <label for="nombreCliente">Nombres*</label>
+                                <input type="text" name="nombreCliente" id="nombreCliente" th:field="*{nombre}"
+                                    required>
+                                <div class="valid-feedback">
+                                    ¡Bien! Datos correctos.
+                                </div>
+                                <div class="invalid-feedback">
+                                    ¡Error! Verifica los datos.
+                                </div>
+                            </div>
+                            <div class="campo-form">
+                                <label for="apellidoCliente">Apellidos</label>
+                                <input type="text" name="apellidoCliente" id="apellidoCliente" th:field="*{apellido}">
+                            </div>
+                            <div class="campo-form">
+                                <label for="direccion">Dirección</label>
+                                <input type="text" name="direccion" id="direccion" placeholder="Dirección de ubicación"
+                                    th:field="*{direccion}">
+                            </div>
+                            <div class="campo-form">
+                                <label for="tipoCliente">Estado del usuario</label>
+                                <select id="tipoCliente" name="tipoCliente" th:field="*{estadoUsuarioIdestadoCliente}">
+                                    <th:block th:each="estado : ${estados}">
+                                        <option th:text="${estado.nombreEstado}" th:value="${estado.idestadoCliente}">
+                                        </option>
+                                    </th:block>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <!-- <div class="campo-form">
+                                <label for="identificacionCliente">N° Identificacion</label>
+                                <input type="number" name="identificacionCliente" id="identificacionCliente">
+                            </div> -->
+                            <div class="campo-form">
+                                <label for="correoCliente">Correo electronico*</label>
+                                <input type="email" name="correoCliente" id="correoCliente"
+                                    placeholder="name@correo.com" th:field="*{correo}" required>
+                                <div class="valid-feedback">
+                                    ¡Bien! Datos correctos.
+                                </div>
+                                <div class="invalid-feedback">
+                                    ¡Error! Verifica los datos.
+                                </div>
+                            </div>
+                            <div class="campo-form">
+                                <label for="celCliente">Celular - telefono*</label>
+                                <input type="number" name="NumMovil" id="celCliente" required>
+                                <div class="valid-feedback">
+                                    ¡Bien! Datos correctos.
+                                </div>
+                                <div class="invalid-feedback">
+                                    ¡Error! Verifica los datos.
+                                </div>
+                            </div>
+                            <div class="campo-form">
+                                <label for="rolCliente">Rol del usuario</label>
+                                <select id="rolCliente" name="rolCliente" th:field="*{rolIdrol}">
+                                    <th:block th:each="rol : ${roles}">
+                                        <option th:text="${rol.nombre}" th:value="${rol.idrol}"></option>
+                                    </th:block>
+                                </select>
+                            </div>
+                            <div class="campo-form">
+                                <label for="confirmaClaveCliente">Contraseña*</label>
+                                <input type="password" placeholder="*******" th:field="*{clave}" required>
+                                <div class="valid-feedback">
+                                    ¡Bien! Datos correctos.
+                                </div>
+                                <div class="invalid-feedback">
+                                    ¡Error! Verifica los datos.
+                                </div>
+                            </div>
+                            <div class="campo-form">
+                                <label for="confirmaClaveCliente">Confirmar contraseña*</label>
+                                <input type="password" name="confirmaClaveCliente" id="confirmaClaveCliente"
+                                    placeholder="*******" required>
+                                <div class="valid-feedback">
+                                    ¡Bien! Datos correctos.
+                                </div>
+                                <div class="invalid-feedback">
+                                    ¡Error! Verifica los datos.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row btn-formulario">
+                        <input type="submit" value="Agregar">
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- FORMULARIO EDITAR USUARIO -->
+    <div class="form-lateral" id="editarForm">
+        <div class="form-gestion">
+            <div class="contenedor-formulario" id="contenedor-formulario">
+                <div class="row">
+                    <div class="cerrar-form">
+                        <i class='bx bx-x abrirCerrarFormEdit iconos'></i>
+                    </div>
+                </div>
+                <div class="row titulo-form">
+                    <h1><i class='bx bx-cog'></i>Editar usuarios</h1>
+                </div>
+                <form th:action="@{/editarUsuario}" th:object="${nuevoUsuario}" method="post" class="needs-validation"
+                    novalidate>
+                    <div class="row">
+                        <div class="col-6">
+                            <input type="hidden" name="idUsuarioEdit" id="idUsuarioEdit" th:field="*{idusuario}">
+                            <div class="campo-form">
+                                <label for="nombreUsuarioEdit">Nombres</label>
+                                <input type="text" name="nombreUsuarioEdit" id="nombreUsuarioEdit" th:field="*{nombre}">
+                            </div>
+                            <div class="campo-form">
+                                <label for="Usuario">Correo electronico</label>
+                                <input type="text" name="correoUsuarioEdit" id="correoUsuarioEdit"
+                                    placeholder="name@correo.com" th:field="*{correo}">
+                            </div>
+                            <div class="campo-form">
+                                <label for="rolClienteEdit">Rol del usuario</label>
+                                <select id="rolClienteEdit" name="rolClienteEdit" th:field="*{rolIdrol}">
+                                    <th:block th:each="rol : ${roles}">
+                                        <option th:text="${rol.nombre}" th:value="${rol.idrol}"></option>
+                                    </th:block>
+                                </select>
+                            </div>
+
+                        </div>
+                        <div class="col-6">
+                            <div class="campo-form">
+                                <label for="apellidoUsuario">Apellidos</label>
+                                <input type="text" name="apellidoUsuarioEdit" id="apellidoUsuarioEdit"
+                                    th:field="*{apellido}">
+                            </div>
+                            <!-- <div class="campo-form">
+                                <label for="celUsuario">Celular - telefono</label>
+                                <input type="number" name="celUsuario" id="celUsuario">
+                            </div> -->
+                            <div class="campo-form">
+                                <label for="direccionUsuarioEdit">Dirección</label>
+                                <input type="text" name="direccionUsuarioEdit" id="direccionUsuarioEdit"
+                                    placeholder="Dirección de ubicación" th:field="*{direccion}">
+                            </div>
+                            <div class="campo-form">
+                                <label for="tipoClienteEdit">Estado del usuario</label>
+                                <select id="tipoClienteEdit" name="tipoClienteEdit"
+                                    th:field="*{estadoUsuarioIdestadoCliente}">
+                                    <th:block th:each="estado : ${estados}">
+                                        <option th:text="${estado.nombreEstado}" th:value="${estado.idestadoCliente}">
+                                        </option>
+                                    </th:block>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row btn-formulario">
+                        <input type="submit" value="Editar">
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <!--ALERTAS Y NOTIFICACIONES-->
+    <div th:if="${param.agregarTrue}">
+        <script>
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'bottom-start',
+                showConfirmButton: false,
+                timer: 5000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast.fire({
+                icon: 'success',
+                title: 'Registro de usuario exitoso'
+            })
+        </script>
+    </div>
+    <div th:if="${param.agregarFalse}">
+        <script>
+            const Toast2 = Swal.mixin({
+                toast: true,
+                position: 'bottom-start',
+                showConfirmButton: false,
+                timer: 5000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast2.fire({
+                icon: 'error',
+                title: 'Error al agregar Usuario<br> verifique los datos.'
+            })
+        </script>
+    </div>
+    <div th:if="${param.actualizarTrue}">
+        <script>
+            const Toast3 = Swal.mixin({
+                toast: true,
+                position: 'bottom-start',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast3.fire({
+                icon: 'success',
+                title: 'Actualizacion exitosa.'
+            })
+        </script>
+    </div>
+    <div th:if="${param.actualizarFalse}">
+        <script>
+            const Toast4 = Swal.mixin({
+                toast: true,
+                position: 'bottom-start',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast4.fire({
+                icon: 'error',
+                title: 'Error al actualizar los datos del Usuario! <br> verifique los datos.'
+            })
+        </script>
+    </div>
+    <div th:if="${param.invalidClave}">
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error...',
+                text: 'Las contraseñas no coinciden!',
+            })
+        </script>
+    </div>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+
+    <script src="/JS/JS.js"></script>
+    <script src="/JS/usuarioJS.js"></script>
+
+
+
+</body>
+
+</html>

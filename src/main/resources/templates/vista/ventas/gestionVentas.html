@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<div th:replace="layouts/menuAdmin :: headerMenu">
+</div>
+
+<body id="body">
+
+    <!-- MENU HEADER -->
+    <div th:replace="layouts/menuAdmin :: navMenuAdmin">
+    </div>
+
+    <!-- MENU SIDEBAR -->
+    <div th:replace="layouts/menuAdmin :: sidebar">
+    </div>
+
+    <!-- CONTENEDOR -->
+    <div class="container">
+        <div class="row titulo-Gestion">
+            <h1>Ventas</h1>
+        </div>
+        <div class="row form-Gestion">
+            <div class="col-8 btn-form justify-content-end">
+                <a  th:href="@{/HacerRegistro}">
+                    <button><i class='bx bxs-shopping-bag'></i></i>Registrar
+                        venta</button>
+                </a>
+            </div>
+        </div>
+        <div class="row ">
+            <div class="col-8">
+                <div class="contenedor-tabla">
+                    <table class="table table-hover" id="tabla_ventas">
+                        <thead>
+                            <tr>
+                                <th scope="col">venta</th>
+                                <th scope="col">Fecha</th>
+                                <th scope="col">Estado</th>
+                                <th scope="col">Cliente</th>
+                                <th scope="col">Total</th>
+                                <th scope="col">Opc</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="venta : ${ventas}">
+                                <th scope="row" th:text="${venta.idventa}"></th>
+                                <td th:text="${venta.fecha}"></td>
+                                <td th:text="${venta.estadoIdestado.nombre}"></td>
+                                <td th:text="${venta.usuarioIdusuario.nombre}"></td>
+                                <td th:text="${venta.total}"></td>
+                                <td valign="middle">
+                                    <div class="opc-tabla">
+                                        <i class='bx bx-cog iconos abrirCerrarFormEdit' id="opc-form"
+                                            th:onclick="cargarEdit([[${venta.idventa}]], [[${venta.estadoIdestado.idestado}]], [[${venta.destino}]])"></i>
+                                        <i class='bx bx-search-alt-2 iconos'></i>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    
+    <!--FORMULARIO EDITAR-->
+    <div class="form-lateral" id="editarForm">
+        <div class="form-gestion">
+            <div class="contenedor-formulario" id="contenedor-formulario">
+                <div class="row">
+                    <div class="cerrar-form">
+                        <i class='bx bx-x abrirCerrarFormEdit iconos'></i>
+                    </div>
+                </div>
+                <div class="row titulo-form">
+                    <h1><i class='bx bx-cog'></i>Editar venta</h1>
+                </div>
+                <form th:action="@{/actualizarVenta}" th:object="${venta}" method="post">
+                    <div class="row">
+                        <input type="hidden" id="idVentaEdit" th:field="*{idventa}">
+                        <div class="col-6">
+                            <div class="campo-form">
+                                <label for="estadoVenta">Estado de la venta</label>
+                                <select id="estadoVentaEdit" th:field="*{estadoIdestado}">
+                                    <th:block th:each="estado : ${estadosVenta}">
+                                        <option th:value="${estado.idestado}" th:text="${estado.nombre}"></option>
+                                    </th:block>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="campo-form">
+                                <label for="destinoVentaEdit">Destino venta</label>
+                                <input type="text" name="destinoVenta" id="destinoVentaEdit" th:field="*{destino}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row btn-formulario">
+                        <input type="submit" value="Editar">
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <!--ALERTAS Y NOTIFICACIONES-->
+    <div th:if="${param.registroTrue}">
+        <script>
+            const Toast3 = Swal.mixin({
+                toast: true,
+                position: 'bottom-start',
+                showConfirmButton: false,
+                timer: 5000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast3.fire({
+                icon: 'success',
+                title: 'Registro de venta exitoso'
+            })
+        </script>
+    </div>
+    <div th:if="${param.registroFalse}">
+        <script>
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'bottom-start',
+                showConfirmButton: false,
+                timer: 5000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast.fire({
+                icon: 'error',
+                title: 'Error aal registrar la venta! <br> Verifique los datos.'
+            })
+        </script>
+    </div>
+    <div th:if="${param.actualizarTrue}">
+        <script>
+            const Toast4 = Swal.mixin({
+                toast: true,
+                position: 'bottom-start',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast4.fire({
+                icon: 'success',
+                title: 'Actualizacion exitosa.'
+            })
+        </script>
+    </div>
+    <div th:if="${param.actualizarFalse}">
+        <script>
+            const Toast2 = Swal.mixin({
+                toast: true,
+                position: 'bottom-start',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast2.fire({
+                icon: 'error',
+                title: 'Error al actualizar los datos de la venta! <br> verifique los datos.'
+            })
+        </script>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+
+    <script src="JS/ventasJS.js"></script>
+
+
+</body>
+
+</html>

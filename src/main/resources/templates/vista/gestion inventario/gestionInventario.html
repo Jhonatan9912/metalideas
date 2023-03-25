@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<div th:replace="layouts/menuAdmin :: headerMenu">
+</div>
+
+<body id="body">
+
+    <!-- MENU HEADER -->
+    <div th:replace="layouts/menuAdmin :: navMenuAdmin">
+    </div>
+
+    <!-- MENU SIDEBAR -->
+    <div th:replace="layouts/menuAdmin :: sidebar">
+    </div>
+
+    <!-- CONTENIDO MODULO INVENTARIO -->
+    <div class="container">
+        <div class="row titulo-Gestion">
+            <h1>Gestión de inventario</h1>
+        </div>
+        <div class="row form-Gestion">
+
+            <div class="col-8">
+                <div class="row">
+                    <div class="col-5"></div>
+                    <div class="col-7">
+                        <div class="row">
+                            <div class="col-4 btn-form">
+                                <a th:href="@{/Proveedores}">
+                                    <button><i class='bx bxs-truck'></i>Proveedores</button>
+                                </a>
+                            </div>
+                            <div class="col-4 btn-form">
+                                <a th:href="@{/verRegistro}">
+                                    <button><i class='bx bxs-food-menu'></i>Registros movimientos</button>
+                                </a>
+                            </div>
+                            <div class="col-4 btn-form">
+                                <button class="abrirCerrarFormAdd"><i class='bx bxs-add-to-queue'></i>Agregar
+                                    producto</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="row ">
+            <div class="col-8">
+                <div class="contenedor-tabla">
+                    <table class="table table-hover" id="tabla_Inventario">
+                        <thead>
+                            <tr>
+                                <th scope="col">Ref.</th>
+                                <th scope="col">Nombre</th>
+                                <th scope="col">Categoria</th>
+                                <th scope="col">Existentes</th>
+                                <!--<th scope="col">Precio</th>-->
+                                <!-- <th style="display:none;" scope="col">Imagen</th> -->
+                                <!--<th scope="col">Marca</th> -->
+                                <th scope="col">Opc</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="producto : ${Productos}">
+                                <td th:text="${producto.idproducto}"></td>
+                                <td th:text="${producto.nombre}"></td>
+                                <td th:text="${producto.tipoIdtipo.nombre}"></td>
+                                <td th:text="${producto.cantidad}"></td>
+                                <div style="display:none;" th:if="${producto.img != null}"><img
+                                        th:src="@{/producto/imagen/{id}(id=${producto.idproducto})}" alt=""></div>
+                                <td valign="middle">
+                                    <div class="opc-tabla">
+                                        <i class='bx bx-cog iconos abrirCerrarFormEdit' id="opc-form"
+                                            th:onclick="cargarEdit([[${producto.idproducto}]], [[${producto.nombre}]], [[${producto.precioVenta}]], [[${producto.precioCompra}]], [[${producto.cantidad}]], [[${producto.descripcion}]], [[${producto.marcaIdmarca.idmarca}]], [[${producto.tipoIdtipo.idcategoria}]])"></i>
+
+                                        <a href="" data-bs-toggle="modal" data-bs-target="#modalEntrar"><i
+                                                class='bx bx-search-alt-2 iconos'
+                                                th:onclick="cargarDetalles([[${producto.idproducto}]], [[${producto.nombre}]], [[${producto.precioVenta}]], [[${producto.precioCompra}]], [[${producto.cantidad}]], [[${producto.descripcion}]],  [[${producto.imgProducto()}]], [[${producto.marcaIdmarca.nombre}]], [[${producto.tipoIdtipo.nombre}]])"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- fORMULARIO AGREGAR -->
+    <div class="form-lateral" id="agregarForm">
+        <div class="form-gestion">
+            <div class="contenedor-formulario" id="contenedor-formulario">
+                <div class="row">
+                    <div class="cerrar-form">
+                        <i class='bx bx-x abrirCerrarFormAdd iconos'></i>
+                    </div>
+                </div>
+                <div class="row titulo-form">
+                    <h1><i class='bx bx-add-to-queue'></i>Agregar producto</h1>
+                </div>
+                <form th:action="@{/agregarProducto}" th:object="${Producto}" class="needs-validation"
+                    enctype="multipart/form-data" method="post" novalidate>
+                    <div class="row">
+                        <div class="row btn-formulario">
+                            <input type="submit" value="Agregar">
+                        </div>
+                        <div class="col-6">
+                            <div class="campo-form">
+                                <label for="nombreProducto">Nombre producto*</label>
+                                <input type="text" name="nombreProducto" id="nombre" th:field="*{nombre}" required>
+                                <div class="valid-feedback">
+                                    ¡Bien! Datos correctos.
+                                </div>
+                                <div class="invalid-feedback">
+                                    ¡Error! Verifica los datos.
+                                </div>
+                            </div>
+
+                            <div class="campo-form">
+                                <label for="precioProducto">Precio venta*</label>
+                                <input type="number" name="precioProducto" id="precio" placeholder="$$$$$"
+                                    th:field="*{precioVenta}" required>
+                                <div class="valid-feedback">
+                                    ¡Bien! Datos correctos.
+                                </div>
+                                <div class="invalid-feedback">
+                                    ¡Error! Verifica los datos.
+                                </div>
+                            </div>
+
+                            <div class="campo-form">
+                                <select id="tipo" name="tipoProducto" th:field="*{tipoIdtipo}" required>
+                                    <option value="">Categoria*</option>
+                                    <option th:each="categoria : ${listaCategoria}" th:value="${categoria.idcategoria}"
+                                        th:text="${categoria.nombre}">
+                                    </option>
+                                </select>
+                                <div class="valid-feedback">
+                                    ¡Bien! Datos correctos.
+                                </div>
+                                <div class="invalid-feedback">
+                                    ¡Error! Verifica los datos.
+                                </div>
+                            </div>
+
+                            <div class="campo-form">
+                                <label for="proveedor">Proveedor*</label>
+                                <input class="form-control" list="listaproveedor" id="proveedor"
+                                    placeholder="Escriba para buscar..." onchange="setProveedorId(this)" required>
+
+                                <input type="hidden" id="proveedorId" name="proveedorId">
+
+                                <datalist id="listaproveedor">
+                                    <option th:each="proveedor : ${listaProveedores}"
+                                        th:value="${proveedor.idproveedor}"
+                                        th:id="'proveedor-' + ${proveedor.idproveedor}">
+                                        <span th:text="${proveedor.nombre}"></span>
+                                    </option>
+                                </datalist>
+                                <div class="valid-feedback">
+                                    ¡Bien! Datos correctos.
+                                </div>
+                                <div class="invalid-feedback">
+                                    ¡Error! Verifica los datos.
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-6">
+                            <div class="campo-form">
+                                <label for="cantidadProducto">Cantidad*</label>
+                                <input type="number" name="cantidadProducto" id="cantidad" th:field="*{cantidad}"
+                                    required>
+                                <div class="valid-feedback">
+                                    ¡Bien! Datos correctos.
+                                </div>
+                                <div class="invalid-feedback">
+                                    ¡Error! Verifica los datos.
+                                </div>
+                            </div>
+
+                            <div class="campo-form">
+                                <label for="preciocompraProducto">Precio compra*</label>
+                                <input type="number" name="preciocompraProducto" id="preciocompraProducto"
+                                    th:field="*{precioCompra}" placeholder="$precio" value="" required>
+                                <div class="valid-feedback">
+                                    ¡Bien! Datos correctos.
+                                </div>
+                                <div class="invalid-feedback">
+                                    ¡Error! Verifica los datos.
+                                </div>
+                            </div>
+
+                            <div class="campo-form">
+                                <select id="Marca" name="marcaProducto" th:field="*{marcaIdmarca}" required>
+                                    <option value="">Marca*</option>
+                                    <option th:each="marca : ${listaMarcas}" th:value="${marca.idmarca}"
+                                        th:text="${marca.nombre}">Dewalt</option>
+                                </select>
+                                <div class="valid-feedback">
+                                    ¡Bien! Datos correctos.
+                                </div>
+                                <div class="invalid-feedback">
+                                    ¡Error! Verifica los datos.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="campo-form">
+                            <label for="detalleProducto">Detalle u observaciones</label>
+                            <textarea class="form-control" type="text" th:field="*{descripcion}" name="detalleProducto"
+                                id="detalle"></textarea>
+                        </div>
+                        <div class="campo-form">
+                            <label for="obsProducto">Observaciones de entrada de producto</label>
+                            <textarea class="form-control" type="text" name="obsProducto" id="obsProducto"></textarea>
+                        </div>
+                        <div class="campo-form">
+                            <label for="imagen">Imagen del producto</label>
+                            <input type="file" name="imagenProducto" id="imagenProducto">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- fORMULARIO EDITAR -->
+    <div class="form-lateral" id="editarForm">
+        <div class="form-gestion">
+            <div class="contenedor-formulario" id="contenedor-formulario">
+                <div class="row">
+                    <div class="cerrar-form">
+                        <i class='bx bx-x abrirCerrarFormEdit iconos'></i>
+                    </div>
+                </div>
+                <div class="row titulo-form">
+                    <h1><i class='bx bx-cog'></i>Editar producto</h1>
+                </div>
+                <form th:action="@{/actualizarProducto}" th:object="${Producto}" method="post"
+                    enctype="multipart/form-data" class="needs-validation" novalidate>
+                    <div class="row">
+                        <div class="col-6">
+                            <input type="hidden" name="nombreProducto" id="idProducto" th:field="*{idproducto}">
+                            <div class="campo-form">
+                                <label for="nombreProducto">Nombre producto</label>
+                                <input type="text" name="nombreProducto" id="nombreProducto" th:field="*{nombre}">
+                            </div>
+                            <div class="campo-form">
+                                <label for="precioProducto">Precio venta</label>
+                                <input type="number" name="precioProducto" id="precioVentaProducto" placeholder="$$$$$"
+                                    th:field="*{precioVenta}">
+                            </div>
+                            <div class="campo-form">
+                                <select id="tipoProducto" name="tipoProducto" th:field="*{tipoIdtipo}" required>
+                                    <option value="">Categoria*</option>
+                                    <option th:each="categoria : ${listaCategoria}" th:value="${categoria.idcategoria}"
+                                        th:text="${categoria.nombre}">
+                                    </option>
+                                </select>
+                                <div class="valid-feedback">
+                                    ¡Bien! Datos correctos.
+                                </div>
+                                <div class="invalid-feedback">
+                                    ¡Error! Verifica los datos.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="campo-form">
+                                <label for="cantidadProducto">Cantidad</label>
+                                <input type="number" name="cantidadProducto" id="cantidadProducto"
+                                    th:field="*{cantidad}">
+                            </div>
+                            <div class="campo-form">
+                                <label for="preciocompraProducto">Precio compra</label>
+                                <input type="number" name="preciocompraProducto" id="precioCompraProducto"
+                                    th:field="*{precioCompra}" placeholder="$$$$$">
+                            </div>
+                            <div class="campo-form">
+                                <select id="marcaProducto" name="marcaProducto" th:field="*{marcaIdmarca}" required>
+                                    <option value="">Marca*</option>
+                                    <option th:each="marca : ${listaMarcas}" th:value="${marca.idmarca}"
+                                        th:text="${marca.nombre}">Dewalt</option>
+                                </select>
+                                <div class="valid-feedback">
+                                    ¡Bien! Datos correctos.
+                                </div>
+                                <div class="invalid-feedback">
+                                    ¡Error! Verifica los datos.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="campo-form">
+                            <label for="detalleProducto">Detalle u observaciones</label>
+                            <textarea class="form-control" type="text" name="detalleProducto" id="detalleProducto"
+                                th:field="*{descripcion}"></textarea>
+                        </div>
+                        <div class="campo-form">
+                            <label for="imagen">Imagen del producto</label>
+                            <input type="file" name="imagen" id="imagen">
+                        </div>
+                    </div>
+                    <div class="row btn-formulario">
+                        <input type="submit" value="Agregar">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!--MODAL DETALLES PRODUCTO-->
+    <div class="contenedor-modal">
+        <div class="modal" tabindex="-1" id="modalEntrar">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <i class="bx bx-x iconos btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            style="color:snow"></i>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col modal-detalle-producto">
+                                <div class="row">
+                                    <h2>Detalles del producto</h2>
+                                </div>
+                                <div class="row">
+                                    <div class="col-5" style="padding-right: 35px;">
+                                        <div class="row">
+                                            <div class="col-3">
+                                                <label for="idProductoModal" class="form-label">Ref.</label>
+                                                <h5 id="idProductoModal"></h5>
+                                            </div>
+                                            <div class="col-9">
+                                                <label for="nombreProductoModal" class="form-label">Nombre</label>
+                                                <h5 id="nombreProductoModal"></h5>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="mb-2">
+                                            <label for="cantidadProductoModal" class="form-label">Existentes:
+                                            </label>
+                                            <h5 id="cantidadProductoModal"></h5>
+                                        </div>
+                                        <hr>
+
+                                        <div class="mb-2">
+                                            <label for="detalleProductoModal" class="form-label">Detalle</label>
+                                            <h5 id="detalleProductoModal"></h5>
+                                        </div>
+                                        <hr>
+
+                                    </div>
+                                    <div class="col-7">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <label for="apellido" class="form-label">Categoria</label>
+                                                <h5 id="tipoProductoModal"></h5>
+                                            </div>
+                                            <div class="col-6">
+                                                <label for="telefono" class="form-label">Marca </label>
+                                                <h5 id="marcaProductoModal"></h5>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <label for="apellido" class="form-label">Precio de venta</label>
+                                                <h5 id="precioVentaProductoModal"></h5>
+                                            </div>
+                                            <div class="col-6">
+                                                <label for="telefono" class="form-label">Precio de compra</label>
+                                                <h5 id="precioCompraProductoModal"></h5>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="row">
+                                            <label for="imgProductoModal">Imagen del producto</label>
+                                            <div id="imgProductoModal" class="img-modalProducto"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="reg-siguiente">
+                                    <button class="btn" data-bs-dismiss="modal" aria-label="Close">Cerrar</button>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--ALERTAS Y NOTIFICACIONES-->
+    <div th:if="${param.agregarProductoFalse}">
+        <script>
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'bottom-start',
+                showConfirmButton: false,
+                timer: 5000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast.fire({
+                icon: 'error',
+                title: 'Error al insertar el producto! <br> verifique los datos.'
+            })
+        </script>
+    </div>
+    <div th:if="${param.actualizarFalse}">
+        <script>
+            const Toast2 = Swal.mixin({
+                toast: true,
+                position: 'bottom-start',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast2.fire({
+                icon: 'error',
+                title: 'Error al actualizar el producto! <br> verifique los datos.'
+            })
+        </script>
+    </div>
+    <div th:if="${param.agregarProductoTrue}">
+        <script>
+            const Toast3 = Swal.mixin({
+                toast: true,
+                position: 'bottom-start',
+                showConfirmButton: false,
+                timer: 5000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast3.fire({
+                icon: 'success',
+                title: 'Registro de producto exitoso'
+            })
+        </script>
+
+        </script>
+    </div>
+    <div th:if="${param.actualizarTrue}">
+        <script>
+            const Toast4 = Swal.mixin({
+                toast: true,
+                position: 'bottom-start',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast4.fire({
+                icon: 'success',
+                title: 'Actualizacion exitosa.'
+            })
+        </script>
+    </div>
+    <div th:if="${param.errorimg}">
+        <script>
+            const Toast5 = Swal.mixin({
+                toast: true,
+                position: 'bottom-start',
+                showConfirmButton: false,
+                timer: 5000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast5.fire({
+                icon: 'error',
+                title: 'La imagen no es valida! <br> intenta con una mas ligera'
+            })
+        </script>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+
+
+
+    <script src="../../JS/JS.js"></script>
+    <script src="../../JS/inventarioJS.js"></script>
+
+
+</body>
+
+</html>

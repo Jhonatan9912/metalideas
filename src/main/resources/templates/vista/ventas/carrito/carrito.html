@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<div th:replace="layouts/menuAdmin :: headerMenu">
+</div>
+
+<body id="body">
+
+    <!-- MENU HEADER -->
+    <div th:replace="layouts/menuAdmin :: navMenuAdmin">
+    </div>
+
+    <!-- MENU SIDEBAR -->
+    <div th:replace="layouts/menuAdmin :: sidebar">
+    </div>
+
+    <div class="container">
+
+        <div class="carrito">
+            <div class="ti-carrito">
+                <div class="row">
+                    <div class="col btn-form btn-volver justify-content-start">   
+                        <a th:href="@{/gestionVentas}">
+                            <button href=""><i class='bx bxs-left-arrow-circle'></i> Volver a ventas</button>
+                        </a>
+                    </div>
+                </div> 
+                <h1><i class="bx bx-cart"></i> Carrito</h1>
+            </div>
+
+
+            <div class="row">
+                <div class="col-9">
+
+                    <div id="listaCarrito">
+                    </div>
+
+                    <div class="row producto-carrito seguir-comprando">
+                        <a data-bs-toggle="modal" data-bs-target="#modalCarrito">
+                            <h1 style="display: flex; align-items: center;">- <i class='bx bxs-cart-add'></i> Agregar
+                                producto-</h1>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="row cont-pedido">
+                        <h1>Hacer venta</h1>
+                        <h4 style="display: flex; align-items: center; justify-content: center;"><i
+                                class='bx bxs-hand-right bx-tada'></i> ¡Tener en cuenta!</h4>
+
+                        <h5>Para obtener mas de un item por producto <strong>se debe confirmar</strong> con el botón
+                            <strong> Aceptar<i class='bx bx-check'></i></strong>
+                        </h5>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!--MODAL AGREGAR AL CARRITO-->
+    <div class="contenedor-modal">
+        <div class="modal" tabindex="-1" id="modalCarrito">
+            <div class="modal-dialog">
+                <div class="modal-content Carrito-modal-content" style="color:snow">
+                    <div class="modal-header">
+                        <i class="bx bx-x iconos btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            style="color:snow"></i>
+                    </div>
+                    <div class="modal-body" style="color:snow">
+                        <table class="table" id="tabla_Carrito_producto" style="color:snow">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Ref.</th>
+                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Categoria</th>
+                                    <th scope="col">Existentes</th>
+                                    <th scope="col">Precio</th>
+                                    <!-- <th style="display:none;" scope="col">Imagen</th> -->
+                                    <!--<th scope="col">Marca</th> -->
+                                    <th scope="col">Opc</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="producto : ${Productos}">
+                                    <td th:text="${producto.idproducto}"></td>
+                                    <td th:text="${producto.nombre}"></td>
+                                    <td th:text="${producto.tipoIdtipo.nombre}"></td>
+                                    <td th:text="${producto.cantidad}"></td>
+                                    <td th:text="'$' + ${producto.precioVenta}"></td>
+                                    <div style="display:none;" th:if="${producto.img != null}"><img
+                                            th:src="@{/producto/imagen/{id}(id=${producto.idproducto})}" alt="">
+                                    </div>
+                                    <td valign="middle">
+                                        <button th:if="${producto.cantidad > 0}" class="btn btn-add-carrito"
+                                            data-bs-dismiss="modal" aria-label="Close"
+                                            th:onclick="agregarProductoAlCarrito([[${producto.idproducto}]], [[${producto.nombre}]], [[${producto.precioVenta}]], [[${producto.precioCompra}]], [[${producto.cantidad}]], [[${producto.descripcion}]],  [[${producto.imgProducto()}]], [[${producto.marcaIdmarca.nombre}]], [[${producto.tipoIdtipo.nombre}]], [[${producto.marcaIdmarca.idmarca}]], [[${producto.tipoIdtipo.idcategoria}]])">
+                                            + Carrito
+                                        </button>
+                                        <button th:if="${producto.cantidad == 0}"
+                                            class="btn btn-add-carrito btn-carrito-inexistencias" disabled>
+                                            <p>No hay productos disponibles</p>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--MODAL REALIZAR VENTA-->
+    <div class="contenedor-modal">
+        <div class="modal" tabindex="-1" id="modalVenta">
+            <div class="modal-dialog">
+                <div class="modal-content Carrito-modal-content" style="color:snow">
+                    <div class="modal-header">
+                        <i class="bx bx-x iconos btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            style="color:snow"></i>
+                    </div>
+                    <div class="modal-body" style="color:snow">
+                        <div class="row">
+                            <div class="col-3"></div>
+                            <div class="col-6">
+                                <!--FORMULARIO AGREGAR-->
+                                <div class="row titulo-form">
+                                    <h1><i class='bx bxs-shopping-bag'></i>Registrar venta</h1>
+                                </div>
+                                <form th:action="@{/registrarVenta}" th:object="${venta}" class="needs-validation"
+                                    method="post" novalidate>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <div class="campo-form">
+                                                <label for="destinoVenta">Destino venta</label>
+                                                <input type="text" name="destinoVenta" id="destinoVenta"
+                                                    th:field="*{destino}">
+                                            </div>
+                                            <div class="campo-form">
+                                                <label for="estadoVenta">Estado de la venta*</label>
+                                                <select th:field="*{estadoIdestado}">
+                                                    <th:block th:each="estado : ${estadosVenta}">
+                                                        <option th:value="${estado.idestado}"
+                                                            th:text="${estado.nombre}">
+                                                        </option>
+                                                    </th:block>
+                                                </select>
+                                            </div>
+                                            <div class="valid-feedback">
+                                                ¡Bien! Datos correctos.
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                ¡Error! Verifica los datos.
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="campo-form">
+                                                <label for="totalVenta">Total*</label>
+                                                $<input type="number" name="totalVenta" id="inputTotal" readonly
+                                                    th:field="*{total}" required>
+                                                <div class="valid-feedback">
+                                                    ¡Bien! Datos correctos.
+                                                </div>
+                                                <div class="invalid-feedback">
+                                                    ¡Error! Verifica los datos.
+                                                </div>
+                                            </div>
+                                            <div class="campo-form">
+                                                <label for="estadoVenta">Metodo de pago*</label>
+                                                <select th:field="*{metodoPagoIdmetodoPago}">
+                                                    <th:block th:each="metodo : ${metodosPago}">
+                                                        <option th:value="${metodo.idmetodoPago}"
+                                                            th:text="${metodo.nombre}">
+                                                        </option>
+                                                    </th:block>
+                                                </select>
+                                            </div>
+                                            <div class="valid-feedback">
+                                                ¡Bien! Datos correctos.
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                ¡Error! Verifica los datos.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <table class="table" id="tabla_Carrito_producto" style="color:snow">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Ref.</th>
+                                                    <th scope="col">Nombre</th>
+                                                    <th scope="col">Precio/unid</th>
+                                                    <th scope="col">cant</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="listadoProductos">                                                
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-8"></div>
+                                        <div class="col-4">
+                                            <div class="row btn-formulario">
+                                                <button type="submit" class="btn-remove-carrito"> Completar <i
+                                                        class='bx bx-check'></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </form>
+                            </div>
+                            <div class="col-3"></div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+
+    <script th:inline="javascript">
+        var productos = /*[[${listaCarrito}]]*/[];
+        let miArreglo = [];
+        let itemArreglo;
+    </script>
+
+    <script src="JS/JS.js"></script>
+    <script src="JS/carritoAdminJS.js"></script>
+
+</body>
+
+
+
+</html>
